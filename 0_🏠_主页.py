@@ -55,8 +55,8 @@ st.subheader('成果物🏅')
 st.caption("接口服务及文档📜；GUI🖼️访问系统")
 ip = host.split(':')[1]
 st.markdown(f"""
-    - 【Flask接口文档地址】：[接口文档]({api_doc})
-    - 【Streamlit访问地址】：http:{ip}:8501
+    - 【Flask接口文档地址】：[api doc]({api_doc})
+    - 【Streamlit访问地址】：[streamlit app](https://basicdatawithapp-grnpyvmtrqq36lsfknyxsh.streamlit.app/)
 """)
 
 # 接口列表
