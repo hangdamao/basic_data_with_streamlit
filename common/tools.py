@@ -10,7 +10,6 @@ import random
 from pathlib import Path
 import pandas as pd
 import streamlit as st
-import jsonpath
 
 
 def now_timestamp():
