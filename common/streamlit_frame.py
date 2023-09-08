@@ -2,8 +2,9 @@ import streamlit as st
 from PIL import Image
 from common.requests_base import requests_run
 from streamlit.elements.image import image_to_url
-from common.tools import is_positive_integer, format_print
+from common.tools import is_positive_integer, format_print, project_dir
 import logging
+from pathlib import Path
 
 
 def service_status_check(host, opt_obj):
@@ -15,7 +16,7 @@ def service_status_check(host, opt_obj):
         st.toast('连接到 **_:red[服务器]_** 失败!', icon='🎉')
         opt_obj.error('目标服务未启动 ！', icon="🚨")
         st.snow()
-        image = Image.open('.\\source\\dft.jpg')
+        image = Image.open(Path(project_dir(), "source", "dft.jpg"))
         st.image(image, caption='Oh My God !')
         st.header("人生如 _:orange[梦]_，你要做的就是不断 _:red[追逐]_ ！")
         st.stop()
@@ -30,7 +31,7 @@ def service_status_check(host, opt_obj):
         # st.balloons()
 
 
-def set_background_img(img='.\\source\\img_1.jpg'):
+def set_background_img(img=Path(project_dir(), "source", "img_1.jpg")):
     # 加载背景图
     img_url = image_to_url(img, width=-3, clamp=False, channels='RGB', output_format='auto', image_id='')
     st.markdown(
@@ -43,7 +44,7 @@ def set_background_img(img='.\\source\\img_1.jpg'):
 
 @st.cache_resource
 def get_audio_bytes():
-    audio_file = open('.\\source\\周杰伦-稻香.mp3', 'rb')
+    audio_file = open(Path(project_dir(), "source", "周杰伦-稻香.mp3"), 'rb')
     audio_bytes = audio_file.read()
     audio_file.close()
     return audio_bytes
