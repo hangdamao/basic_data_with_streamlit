@@ -1,0 +1,5 @@
+streamlit==1.25.0
+Faker==8.12.1
+Flask==2.3.2
+mimesis==10.1.0
+

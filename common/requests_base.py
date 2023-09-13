@@ -10,13 +10,13 @@ def requests_run(method, host, api_path, **kwargs):
     logging.info(f'请求地址：{url}')
     try:
         response = requests.request(method=method, url=url, timeout=5, **kwargs)
-        # if 'json' in kwargs:
-            # logging.info(f'请求参数：{kwargs.get("json")}')
-        # if 'params' in kwargs:
-            # logging.info(f'请求参数：{kwargs.get("params")}')
+        if 'json' in kwargs:
+            logging.info(f'请求参数：{kwargs.get("json")}')
+        if 'params' in kwargs:
+            logging.info(f'请求参数：{kwargs.get("params")}')
         if response.status_code == 200:
             result = response.json()
-            # logging.info(f'接口返回：{result}')
+            logging.info(f'接口返回：{result}')
             return result
         else:
             # print(response.status_code)
