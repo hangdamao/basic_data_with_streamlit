@@ -7,28 +7,62 @@ import logging
 from pathlib import Path
 
 
+def sever_fail_page():
+    # 服务器报错页面
+    logging.info("服务未启动 ！")
+    st.toast('连接到 **_:red[服务器]_** 失败!', icon='🎉')
+    st.snow()
+    image = Image.open(Path(project_dir(), "source", "dft.jpg"))
+    st.image(image, caption='Oh My God !')
+    st.header("人生如 _:orange[梦]_，你要做的就是不断 _:red[追逐]_ ！")
+    st.stop()
+
+
 def service_status_check(host, opt_obj):
     # 目标服务状态检查
     res = requests_run(host=host, api_path='/home/', method='GET')
-
-    def __inner():
-        print("服务未启动 ！")
-        st.toast('连接到 **_:red[服务器]_** 失败!', icon='🎉')
-        opt_obj.error('目标服务未启动 ！', icon="🚨")
-        st.snow()
-        image = Image.open(Path(project_dir(), "source", "dft.jpg"))
-        st.image(image, caption='Oh My God !')
-        st.header("人生如 _:orange[梦]_，你要做的就是不断 _:red[追逐]_ ！")
-        st.stop()
-
     if res is None:
-        __inner()
+        opt_obj.error('目标服务未启动 ！', icon="🚨")
+        return False
     if res == "Error":
-        __inner()
+        opt_obj.error('目标服务未启动 ！', icon="🚨")
+        return False
     if res.get("service_state") == "OK":
         opt_obj.success('目标服务器正常~', icon="✅")
         print("服务正常！")
         # st.balloons()
+        return True
+
+
+def set_sidebar(local_host, test_host):
+    # 设置侧边栏
+    sid = st.sidebar
+
+    # sid.title('基础数据服务')
+    local = f'本地服务（{local_host}）'
+    test = f'测试服务（{test_host}）'
+    sid.write(" **:blue[请选择服务器：]** ")
+    select_serve = sid.selectbox('请选择服务器', (local, test),
+                                 index=1,
+                                 help="所选服务器地址即为页面接口的访问地址！",
+                                 label_visibility="collapsed")
+    # 链接服务器状态条
+    if select_serve == local:
+        if service_status_check(host=local_host, opt_obj=sid) is True:
+            # st.toast('连接到 **_:green[本地服务]_** 成功!', icon='🎉')
+            logging.info(f"当前为【{select_serve}】：{local_host}")
+            return local_host
+        else:
+            return False
+    elif select_serve == test:
+        if service_status_check(host=test_host, opt_obj=sid) is True:
+            # st.toast('连接到 **_:green[测试服务]_** 成功!', icon='🎉')
+            logging.info(f"当前为【{select_serve}】：{test_host}")
+            return test_host
+        else:
+            return False
+    else:
+        pass
 
 
 def set_background_img(img=Path(project_dir(), "source", "img_1.jpg")):
@@ -50,56 +84,13 @@ def get_audio_bytes():
     return audio_bytes
 
 
-def set_sidebar(local_host, test_host):
-    # 设置侧边栏
-    sid = st.sidebar
-
-    def __inner_code():
-        # 依赖库
-        sid.write(" **:blue[依赖模块：]** ")
-        code = """
-            Faker==8.12.1
-            Flask==2.3.2
-            Flask-Docs==0.7.2
-            mimesis==10.1.0
-            requests==2.31.0
-            streamlit==1.25.0
-            ulid-py==1.1.0
-        """
-        sid.code(code, language='python')
-
-    # sid.title('基础数据服务')
-    local = f'本地服务（{local_host}）'
-    test = f'测试服务（{test_host}）'
-    sid.write(" **:blue[请选择服务器：]** ")
-    select_serve = sid.selectbox('请选择服务器', (local, test),
-                                 index=1,
-                                 help="所选服务器地址即为页面接口的访问地址！",
-                                 label_visibility="collapsed")
-    # 链接服务器状态条
-    if select_serve == local:
-        service_status_check(host=local_host, opt_obj=sid)
-        # st.toast('连接到 **_:green[本地服务]_** 成功!', icon='🎉')
-        logging.info(f"当前为【{select_serve}】：{local_host}")
-        __inner_code()
-        return local_host
-    elif select_serve == test:
-        service_status_check(host=test_host, opt_obj=sid)
-        # st.toast('连接到 **_:green[测试服务]_** 成功!', icon='🎉')
-        logging.info(f"当前为【{select_serve}】：{test_host}")
-        __inner_code()
-        return test_host
-    else:
-        pass
-
-
 def send_get_request_and_show_response(host, api_path, count):
     """发送get请求并展示结果"""
     with st.spinner('加载中...'):
         # if is_positive_integer(num) is True:
         data = {"count": count}
         res = requests_run(method='GET', host=host, api_path=api_path, params=data)
-        print(f'get==============={res}')
+        # print(f'get==============={res}')
         if res.get("code") == "0000":
             st.write(" **:blue[请求地址如下：]** ")
             st.code(host + api_path + f"?count={count}", 'Shell')
@@ -122,7 +113,7 @@ def send_post_request_and_show_response(host, api_path, length, count):
         # if is_positive_integer(length) and is_positive_integer(count) is True:
         data = {"length": length, "number": count}
         res = requests_run(method='POST', host=host, api_path=api_path, json=data)
-        print(f'post==============={res}')
+        # print(f'post==============={res}')
         if res.get("code") == "0000":
             st.write(" **:blue[请求地址如下：]** ")
             st.code(host + api_path, 'Shell')
@@ -153,7 +144,7 @@ def get_show(host, api_path, desc, input_key, api_doc):
                               key=input_key,
                               placeholder="请填写正参数...",
                               label_visibility='collapsed')
-        logging.info(f'本次请求数量为---：{count}')
+        # logging.info(f'本次请求数量为---：{count}')
         # 提交按钮
         button = st.form_submit_button("submit", help="点击后调用接口", type="primary")
         if button:
@@ -176,14 +167,14 @@ def post_show(host, api_path, desc, input_1_key, input_2_key, api_doc):
                                key=input_1_key,
                                placeholder="请填写正参数...",
                                label_visibility='collapsed')
-        logging.info(f'本次请求长度为---：{length}')
+        # logging.info(f'本次请求长度为---：{length}')
         st.write(" **:blue[请输入数量：]** ")
         number = st.text_input(label="数量",
                                max_chars=3,
                                key=input_2_key,
                                placeholder="请填写正参数...",
                                label_visibility='collapsed')
-        logging.info(f'本次请求数量为---：{number}')
+        # logging.info(f'本次请求数量为---：{number}')
         # 提交按钮
         button = st.form_submit_button("submit", help="点击后调用接口", type="primary")
         if button:
